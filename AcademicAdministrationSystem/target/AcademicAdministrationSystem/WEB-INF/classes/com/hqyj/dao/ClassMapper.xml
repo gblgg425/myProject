@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hqyj.dao.ClassMapper">
+	<resultMap type="Classbj" id="queryClass">
+		<id column="bid" property="bid"/>
+		<result column="bno" property="bno"/>
+		<result column="bname" property="bname"/>
+		<result column="bnum" property="bnum"/>
+		<result column="bban" property="bzr"/>
+		 <!-- 一对一 -->
+		<!--<association property="bzr" javaType="com.hqyj.entity.Teacher">
+			<result column="tname" property="tName"/>
+		</association> -->
+	</resultMap>
+	<!-- 班级学生 -->
+	<resultMap type="Student" id="queryClassStudent">
+		<id column="sid" property="sId" jdbcType="INTEGER" />
+		<result column="sno" property="sNo" jdbcType="VARCHAR" />
+		<result column="sname" property="sName" jdbcType="INTEGER" />
+		<result column="ssex" property="sSex" jdbcType="VARCHAR" />
+		<result column="saddress" property="sAddress" jdbcType="VARCHAR" />
+		<result column="sage" property="sAge" jdbcType="INTEGER" />
+		<result column="sbid" property="sBid" jdbcType="VARCHAR" />
+	</resultMap>
+	<!-- 查询所有班级 -->
+	<select id="queryClassAll" resultMap="queryClass">
+		select * from banji <!-- b,teacher t where b.bban=t.tno -->
+	</select>
+	<!-- 根据id查班级 -->
+	<select id="queryClassById" resultMap="queryClass">
+		select * from banji where bno=#{bid}<!-- b,teacher t where b.bban=t.tno -->
+	</select>
+	<!-- 班级修改 -->
+	 <update id="updateClass" >
+      	update banji set bname=#{bname},bnum=#{bnum},bban=#{bzr} where bno=#{bno}
+    </update>
+	<!-- 根据班级查学生 -->
+	<select id="queryClassStudent" resultMap="queryClassStudent">
+		select * from student where sbid=#{sBid}
+	</select>
+</mapper>

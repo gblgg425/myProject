@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hqyj.dao.UserMapper">
+
+	<resultMap id="findUser" type="User">
+		<id column="uid" property="uId" jdbcType="INTEGER" />
+		<result column="uname" property="uName" jdbcType="VARCHAR" />
+		<result column="upwd" property="uPwd" jdbcType="DATE" />
+		<association property="role" javaType="com.hqyj.entity.Role">
+			<id column="rid" property="rId" />
+			<result column="rname" property="rName" />
+		</association>
+	</resultMap>
+
+	<select id="findUserByUsername" parameterType="java.lang.String"
+		resultMap="findUser">
+		select * from user u,role r where u.urid=r.rid and
+		u.uname=#{uName}
+	</select>
+	<!-- 查询所有用户对应的角色信息 -->
+	<select id="findUserAll" resultMap="findUser">
+		select * from user u,role r where u.urid=r.rid
+	</select>
+	
+	<!-- 根据用户名更新密码 -->
+	<update id="updateUserPwd" parameterType="com.hqyj.entity.User">
+		update user set upwd=#{uPwd} where uname=#{uName}
+	</update>
+	
+	<!-- 根据id修改用户角色 -->
+	<update id="updateRole" parameterType="com.hqyj.entity.Role">
+		update role r set r.rname=#{rName} where r.rid=#{rId};
+	</update>
+</mapper>

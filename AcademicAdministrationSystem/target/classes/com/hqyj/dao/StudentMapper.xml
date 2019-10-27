@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hqyj.dao.StudentMapper">
+	<resultMap id="StudentMap" type="com.hqyj.entity.Student">
+		<!-- 学生 -->
+		<id column="sid" property="sId" jdbcType="INTEGER" />
+		<result column="sno" property="sNo" jdbcType="VARCHAR" />
+		<result column="sname" property="sName" jdbcType="INTEGER" />
+		<result column="ssex" property="sSex" jdbcType="VARCHAR" />
+		<result column="saddress" property="sAddress" jdbcType="VARCHAR" />
+		<result column="sage" property="sAge" jdbcType="INTEGER" />
+		<result column="sbid" property="sBid" jdbcType="VARCHAR" />
+		<!-- 班级 -->
+		<association property="cbj" javaType="com.hqyj.entity.Classbj">
+			<id column="bid" property="bid" jdbcType="INTEGER" />
+			<result column="bno" property="bno" jdbcType="INTEGER" />
+			<result column="bname" property="bname" jdbcType="VARCHAR" />
+			<result column="bnum" property="bnum" jdbcType="INTEGER" />
+			<result column="bban" property="bzr" jdbcType="INTEGER" />
+		</association>
+		<!-- 考勤 -->
+		<collection property="stuKq" ofType="com.hqyj.entity.StudentKaoqin">
+			<id column="skid" property="skId" jdbcType="INTEGER" />
+			<result column="fk_skid" property="fk_skId" jdbcType="INTEGER" />
+			<result column="contion" property="sContion" jdbcType="VARCHAR" />
+		</collection>
+		<!-- 课程 -->
+		<collection property="course" ofType="com.hqyj.entity.Course">
+			<id column="cid" property="cId" jdbcType="INTEGER" />
+			<result column="cno" property="cNo" jdbcType="INTEGER" />
+			<result column="cname" property="cName" jdbcType="VARCHAR" />
+			<!-- 成绩 -->
+			<collection property="cj" ofType="com.hqyj.entity.ChengJi">
+				<id column="cjid" property="cjId" jdbcType="INTEGER" />
+				<result column="fk_cjcid" property="cjcId" jdbcType="INTEGER" />
+				<result column="fk_cjsid" property="cjsId" jdbcType="INTEGER" />
+				<result column="score" property="score" jdbcType="INTEGER" />
+			</collection>
+		</collection>
+	</resultMap>
+
+	<!-- 查询学生个人成绩 -->
+	<select id="queryStudentScore" resultMap="StudentMap">
+		SELECT s.sno,s.sname,c.cname,cj.score from student s,chengji cj,course c
+		WHERE s.sid=cj.fk_cjsid and cj.fk_cjcid=c.cid and s.sno=#{sNo};
+
+	</select>
+
+
+
+	<!-- 查询学生个人选课 -->
+	<select id="queryStudentCourseInfo" resultMap="StudentMap">
+		SELECT
+		s.sno,s.sname,c.cname from student s,course c,sc WHERE
+		s.sid=sc.fk_sid
+		and c.cid=sc.fk_kid and s.sno=#{sNo};
+	</select>
+
+	<!-- 查询学生个人考勤 -->
+	<select id="queryStudentKaoqin" resultMap="StudentMap">
+		SELECT
+		s.sno,s.sname,bj.bname,sk.contion FROM student s,skaoqin sk,banji bj
+		WHERE s.sid=sk.fk_skid and s.sbid=bj.bid and s.sno=#{sNo};
+	</select>
+
+	<!-- 查询学生个人信息 -->
+	<select id="queryStudentInfo" resultMap="StudentMap">
+		SELECT
+		s.sno,s.sname,s.ssex,s.sage,s.saddress,bj.bname FROM student s,banji
+		bj WHERE s.sbid=bj.bid and s.sno=#{sNo};
+	</select>
+
+	<!-- 查询所有学生成绩 -->
+	<select id="queryAllStudentScore" resultMap="StudentMap">
+		SELECT* FROM student
+		s,chengji
+		cj,banji bj,course c WHERE s.sid=cj.fk_cjsid and
+		cj.fk_cjcid=c.cid and s.sbid=bj.bid
+	</select>
+
+	<!-- 添加学生成绩 -->
+	<insert id="addStudentScore">
+		insert into chengji
+		values(null,#{cjcId},#{cjsId},#{score})
+	</insert>
+
+	<!-- 查询所有学生信息 -->
+	<select id="queryAllStudentInfo" resultMap="StudentMap">
+		SELECT * FROM student s,banji bj WHERE s.sbid=bj.bid
+	</select>
+
+	<!-- 添加学生信息 -->
+	<insert id="addStudentInfo">
+		insert into student
+		values(null,#{sNo},#{sName},#{sSex},#{sAge},#{sAddress},#{sBid})
+	</insert>
+
+	<!-- 删除学生信息 -->
+	<delete id="deleteStudentBySno" parameterType="int">
+		DELETE FROM student where sno=#{sNo}
+	</delete>
+
+	 <!-- 修改学生信息 -->
+    <update id="updateStudent" >
+      	update student set sname=#{sName},ssex=#{sSex},sage=#{sAge},saddress=#{sAddress}  where sno=#{sNo}
+    </update>
+	
+	<!-- 查询学生选课 -->
+	<select id="queryAllStudentCourse" resultMap="StudentMap">
+		sELECT
+		* from student s,course c,sc WHERE
+		s.sid=sc.fk_sid
+		and c.cid=sc.fk_kid
+	</select>
+
+	<!-- 查询学生考勤 -->
+	<select id="queryAllStudentKaoqin" resultMap="StudentMap">
+		SELECT
+		* FROM
+		student s,skaoqin sk,banji bj
+		WHERE s.sid=sk.fk_skid and s.sbid=bj.bid
+	</select>
+	
+	<!-- 添加学生考勤信息 -->
+	<insert id="addStudentKaoqinInfo">
+		insert into skaoqin values(null,#{skId},#{sContion});
+	</insert>
+</mapper>

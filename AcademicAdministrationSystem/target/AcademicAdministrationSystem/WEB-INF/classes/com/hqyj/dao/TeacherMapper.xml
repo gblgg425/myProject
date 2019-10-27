@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hqyj.dao.TeacherMapper">
+	<resultMap type="Teacher" id="queryTeacher">
+		<id column="tid" property="tId" />
+		<result column="tno" property="tNo" />
+		<result column="tname" property="tName" />
+		<result column="tsex" property="tSex" />
+		<result column="tage" property="tAge" />
+		<result column="tposition" property="tPos" />
+		<!-- 一对一 -->
+		<association property="kq" javaType="com.hqyj.entity.TeacherKaoQin">
+			<id column="tkid" property="tkid" />
+			<result column="tcontion" property="tcontion" />
+		</association>
+
+	</resultMap>
+
+	<!-- 查询所有老师信息 -->
+	<select id="queryTeacherAll" resultMap="queryTeacher">
+		select * from teacher
+	</select>
+	<select id="queryTeacherAllLimit"  parameterType="com.hqyj.entity.PageType" resultMap="queryTeacher">
+		select * from teacher limit #{start},#{size}
+	</select>
+	
+	<!--查询老师个人考勤 -->
+	<select id="queryTeacherKaoQin" resultMap="queryTeacher">
+		select * from teacher
+		t,tkaoqin k where t.tid=k.fk_tkid and t.tno=#{tNo}
+	</select>
+
+	<!--查询所有老师考勤 -->
+	<select id="queryTeacherKaoQinAllLimit" parameterType="com.hqyj.entity.PageType" resultMap="queryTeacher">
+		select * from
+		teacher t,tkaoqin k where t.tid=k.fk_tkid limit #{start},#{size}
+	</select>
+	<select id="queryTeacherKaoQinAll"  resultMap="queryTeacher">
+		select * from
+		teacher t,tkaoqin k where t.tid=k.fk_tkid 
+	</select>
+
+
+
+	<!-- 通过个人老师账号查询个人信息 -->
+	<select id="queryTeacherByTno" resultMap="queryTeacher">
+		select * from teacher t
+		where t.tno=#{tNo}
+	</select>
+
+
+	<!-- 删除老师信息 -->
+	<delete id="deleteTeacherByTno" parameterType="int">
+       DELETE FROM teacher  where tno=#{tNo}
+	</delete>
+
+    <!-- 添加老师信息 -->
+    <insert id="addTeacher"  >
+    	insert into teacher values(null,#{tNo},#{tName},#{tSex},#{tAge},#{tPos})
+    </insert>
+    
+    <!-- 修改老师信息 -->
+    <update id="updateTeacher" >
+      	update teacher set tname=#{tName},tsex=#{tSex},tage=#{tAge},tposition=#{tPos} where tno=#{tNo}
+    </update>
+
+</mapper>
